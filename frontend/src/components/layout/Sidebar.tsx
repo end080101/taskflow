@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { NavLink } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Clock,
@@ -7,10 +7,9 @@ import {
   ScrollText,
   KeyRound,
   Package,
-  GitBranch,
   Settings,
   Zap,
-} from 'lucide-react'
+} from 'lucide-react';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: '仪表盘' },
@@ -19,12 +18,9 @@ const navItems = [
   { to: '/logs', icon: ScrollText, label: '执行日志' },
   { to: '/envs', icon: KeyRound, label: '环境变量' },
   { to: '/dependencies', icon: Package, label: '依赖包' },
-  { to: '/subscriptions', icon: GitBranch, label: '订阅管理' },
-]
+];
 
-const bottomItems = [
-  { to: '/settings', icon: Settings, label: '系统设置' },
-]
+const bottomItems = [{ to: '/settings', icon: Settings, label: '系统设置' }];
 
 export function Sidebar() {
   return (
@@ -34,7 +30,9 @@ export function Sidebar() {
         <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
           <Zap size={15} className="text-white" />
         </div>
-        <span className="font-bold text-[var(--text-primary)] text-base tracking-tight">TaskFlow</span>
+        <span className="font-bold text-[var(--text-primary)] text-base tracking-tight">
+          TaskFlow
+        </span>
       </div>
 
       {/* Nav */}
@@ -51,10 +49,18 @@ export function Sidebar() {
         ))}
       </div>
     </aside>
-  )
+  );
 }
 
-function NavItem({ to, icon: Icon, label }: { to: string; icon: any; label: string }) {
+function NavItem({
+  to,
+  icon: Icon,
+  label,
+}: {
+  to: string;
+  icon: any;
+  label: string;
+}) {
   return (
     <NavLink
       to={to}
@@ -64,12 +70,12 @@ function NavItem({ to, icon: Icon, label }: { to: string; icon: any; label: stri
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
           isActive
             ? 'bg-indigo-600/15 text-indigo-400 font-medium'
-            : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
+            : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]',
         )
       }
     >
       <Icon size={16} />
       {label}
     </NavLink>
-  )
+  );
 }

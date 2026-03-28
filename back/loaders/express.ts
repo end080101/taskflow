@@ -18,30 +18,33 @@ export default ({ app }: { app: Application }) => {
   app.set('strict routing', true);
   app.set('trust proxy', 'loopback');
   app.use(cors());
-  
+
   // Security: Path normalization middleware to prevent case variation attacks
   app.use((req, res, next) => {
     const originalPath = req.path;
     const normalizedPath = originalPath.toLowerCase();
-    
+
     // Block requests with case variations on protected paths
-    if (originalPath !== normalizedPath && 
-        (normalizedPath.startsWith('/api/') || normalizedPath.startsWith('/open/'))) {
+    if (
+      originalPath !== normalizedPath &&
+      (normalizedPath.startsWith('/api/') ||
+        normalizedPath.startsWith('/open/'))
+    ) {
       return res.status(400).json({
         code: 400,
-        message: 'Invalid path format'
+        message: 'Invalid path format',
       });
     }
-    
+
     next();
   });
-  
+
   // Rewrite URLs to strip baseUrl prefix if configured
   // This allows the rest of the app to work without baseUrl awareness
   if (config.baseUrl) {
     app.use(rewrite(`${config.baseUrl}/*`, '/$1'));
   }
-  
+
   app.get(`${config.api.prefix}/env.js`, serveEnv);
   app.use(`${config.api.prefix}/static`, express.static(config.uploadPath));
 
@@ -51,12 +54,16 @@ export default ({ app }: { app: Application }) => {
   const frontendPath = path.join(config.rootPath, 'static/dist');
   app.use(express.static(frontendPath));
 
+  const isDev = process.env.NODE_ENV === 'development';
+
   app.use(
     expressjwt({
       secret: config.jwt.secret,
       algorithms: ['HS384'],
     }).unless({
-      path: [...config.apiWhiteList, /^(\/(?!api\/).*)$/i],
+      path: isDev
+        ? [/^(\/api\/|\/open\/)/, /^(\/(?!api\/).*)$/i]
+        : [...config.apiWhiteList, /^(\/(?!api\/).*)$/i],
     }),
   );
 
@@ -100,8 +107,12 @@ export default ({ app }: { app: Application }) => {
     if (
       !headerToken &&
       originPath &&
-      config.apiWhiteList.includes(originPath)
+      (config.apiWhiteList.includes(originPath) || isDev)
     ) {
+      return next();
+    }
+
+    if (isDev) {
       return next();
     }
 

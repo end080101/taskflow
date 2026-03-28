@@ -13,7 +13,12 @@ import { AuthDataType, SystemModel } from '../data/system';
 import SystemService from '../services/system';
 import UserService from '../services/user';
 import { writeFile, readFile } from 'fs/promises';
-import { createRandomString, fileExist, isDemoEnv, safeJSONParse } from '../config/util';
+import {
+  createRandomString,
+  fileExist,
+  isDemoEnv,
+  safeJSONParse,
+} from '../config/util';
 import OpenService from '../services/open';
 import { shareStore } from '../shared/store';
 import Logger from './logger';

@@ -1,0 +1,11 @@
+{
+  "watch": ["back"],
+  "ignore": [
+    "back/**/*.test.ts",
+    "back/**/node_modules",
+    "back/data",
+    "back/**/*.json"
+  ],
+  "ext": "ts,json",
+  "delay": 1000
+}
