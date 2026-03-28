@@ -317,6 +317,7 @@ export default function Scripts() {
                       variant="ghost"
                       size="icon"
                       className="h-5 w-5"
+                      title="重命名"
                       onClick={(e) => {
                         e.stopPropagation();
                         openRenameDialog(file);
@@ -329,6 +330,7 @@ export default function Scripts() {
                         variant="ghost"
                         size="icon"
                         className="h-5 w-5"
+                        title="运行脚本"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleFileClick(file);
@@ -345,6 +347,7 @@ export default function Scripts() {
                       variant="ghost"
                       size="icon"
                       className="h-5 w-5 text-red-400"
+                      title="删除文件"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteMutation.mutate({
