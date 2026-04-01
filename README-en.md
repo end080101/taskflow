@@ -1,6 +1,4 @@
 <div align="center">
-<img width="100" src="https://user-images.githubusercontent.com/22700758/191449379-f9f56204-0e31-4a16-be5a-331f52696a73.png">
-
 <h1 align="center">TaskFlow</h1>
 
 A self-hosted task scheduler and script management platform for trusted environments, evolved from Qinglong with a new React panel and end-to-end tested workflows.
@@ -11,8 +9,6 @@ Timed task management platform supporting Python3, JavaScript, Shell and Typescr
 
 [GitHub Issues](https://github.com/end080101/taskflow/issues) / [GitHub Repository](https://github.com/end080101/taskflow)
 </div>
-
-![cover](https://user-images.githubusercontent.com/22700758/244847235-8dc1ca21-e03f-4606-9458-0541fab60413.png)
 
 ## Features
 
@@ -35,8 +31,7 @@ Timed task management platform supporting Python3, JavaScript, Shell and Typescr
 
 ## Project Origin
 
-- This project is evolved from Qinglong's core scheduling capabilities
-- The goal is not to hide the original foundation, but to build a more modern frontend, deployment flow and testing experience on top of it
+- This project is evolved from Qinglong's core scheduling capabilities, with a focus on the new frontend, deployment compatibility and testing experience
 
 ## Runtime Requirements
 
@@ -122,5 +117,4 @@ Open your browser and visit <http://127.0.0.1:5700>
 
 ## Acknowledgements
 
-- The project foundation is built on Qinglong's mature scheduling capabilities
-- The current repository focuses on the new frontend, deployment compatibility and testing improvements
+- Thanks to Qinglong for the mature scheduling foundation behind this project

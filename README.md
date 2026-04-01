@@ -1,6 +1,4 @@
 <div align="center">
-<img width="100" src="https://user-images.githubusercontent.com/22700758/191449379-f9f56204-0e31-4a16-be5a-331f52696a73.png">
-
 <h1 align="center">TaskFlow</h1>
 
 一个面向内网与自托管场景的任务调度与脚本管理平台，基于 Qinglong 核心能力演进，提供新版 React 面板与更完整的端到端测试。
@@ -11,8 +9,6 @@
 
 [问题反馈](https://github.com/end080101/taskflow/issues) / [项目仓库](https://github.com/end080101/taskflow)
 </div>
-
-![cover](https://user-images.githubusercontent.com/22700758/244847235-8dc1ca21-e03f-4606-9458-0541fab60413.png)
 
 ## 功能
 
@@ -34,8 +30,7 @@
 
 ## 项目来源
 
-- 本项目基于 Qinglong 的核心能力演进而来
-- 目标不是抹去原项目来源，而是在保留成熟调度能力的基础上，提供更现代的前端与更完整的部署、测试体验
+- 本项目基于 Qinglong 核心能力演进而来，并聚焦于新版前端、部署兼容与测试体验
 
 ## 运行环境
 
@@ -122,5 +117,4 @@ node static/build/app.js
 
 ## 致谢
 
-- 本项目能力基础来自 Qinglong
-- 新版前端、部署适配与测试体系为本仓库当前维护重点
+- 感谢 Qinglong 提供成熟的任务调度能力基础
