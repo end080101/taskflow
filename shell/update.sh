@@ -214,13 +214,13 @@ run_extra_shell() {
 ## 脚本用法
 usage() {
   echo -e "$cmd_update 命令使用方法："
-  echo -e "1.  $cmd_update update                                                                  # 更新并重启青龙"
+  echo -e "1.  $cmd_update update                                                                  # 更新并重启 TaskFlow"
   echo -e "2.  $cmd_update extra                                                                   # 运行自定义脚本"
   echo -e "3.  $cmd_update raw <fileurl>                                                           # 更新单个脚本文件"
   echo -e "4.  $cmd_update repo <repourl> <path> <blacklist> <dependence> <branch> <extensions>    # 更新单个仓库的脚本"
   echo -e "5.  $cmd_update rmlog <days>                                                            # 删除旧日志"
   echo -e "6.  $cmd_update bot                                                                     # 启动tg-bot"
-  echo -e "7.  $cmd_update check                                                                   # 检测青龙环境并修复"
+  echo -e "7.  $cmd_update check                                                                   # 检测 TaskFlow 环境并修复"
   echo -e "8.  $cmd_update resetlet                                                                # 重置登录错误次数"
   echo -e "9.  $cmd_update resettfa                                                                # 禁用两步登录"
   echo -e "10. $cmd_update resetpwd                                                                # 修改登录密码"
@@ -258,49 +258,13 @@ reload_qinglong() {
 
 ## 更新 qinglong
 update_qinglong() {
-  rm -rf ${dir_tmp}/*
-  local mirror="gitee"
-  local downloadQLUrl="https://gitee.com/whyour/qinglong/repository/archive"
-  local downloadStaticUrl="https://gitee.com/whyour/qinglong-static/repository/archive"
-  local githubStatus=$(curl -s --noproxy "*" -m 2 -IL "https://google.com" | grep 200)
-  if [[ ! -z $githubStatus ]]; then
-    mirror="github"
-    downloadQLUrl="https://github.com/whyour/qinglong/archive/refs/heads"
-    downloadStaticUrl="https://github.com/whyour/qinglong-static/archive/refs/heads"
-  fi
-  echo -e "使用 ${mirror} 源更新...\n"
-
-  local primary_branch="master"
-  if [[ "${QL_BRANCH}" == "develop" ]] || [[ "${QL_BRANCH}" == "debian" ]] || [[ "${QL_BRANCH}" == "debian-dev" ]]; then
-    primary_branch="${QL_BRANCH}"
-  fi
-
-  wget -cqO "${dir_tmp}/ql.zip" "${downloadQLUrl}/${primary_branch}.zip"
-  exit_status=$?
-
-  if [[ $exit_status -eq 0 ]]; then
-    echo -e "更新青龙源文件成功...\n"
-
-    unzip -oq ${dir_tmp}/ql.zip -d ${dir_tmp}
-
-    update_qinglong_static
-  else
-    echo -e "更新青龙源文件失败，请检查网络...\n"
-  fi
+  echo -e "TaskFlow 当前不提供内置自更新，请通过 Git 拉取最新代码或重新执行 Docker 部署。\n"
+  return 1
 }
 
 update_qinglong_static() {
-  wget -cqO "${dir_tmp}/static.zip" "${downloadStaticUrl}/${primary_branch}.zip"
-  exit_status=$?
-
-  if [[ $exit_status -eq 0 ]]; then
-    echo -e "更新青龙静态资源成功...\n"
-    unzip -oq ${dir_tmp}/static.zip -d ${dir_tmp}
-
-    check_update_dep
-  else
-    echo -e "更新青龙静态资源失败，请检查网络...\n"
-  fi
+  echo -e "TaskFlow 当前不提供静态资源独立更新。\n"
+  return 1
 }
 
 check_update_dep() {

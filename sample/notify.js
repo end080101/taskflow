@@ -681,7 +681,7 @@ function do_qywxamNotify(text, desp) {
               textcard: {
                 title: `${text}`,
                 description: `${desp}`,
-                url: 'https://github.com/whyour/qinglong',
+                url: 'https://github.com/end080101/taskflow',
                 btntxt: '更多',
               },
             };
@@ -1308,8 +1308,9 @@ function ntfyNotify(text, desp) {
       if (NTFY_TOKEN) {
         options.headers['Authorization'] = `Bearer ${NTFY_TOKEN}`;
       } else if (NTFY_USERNAME && NTFY_PASSWORD) {
-        options.headers['Authorization'] =
-          `Basic ${Buffer.from(`${NTFY_USERNAME}:${NTFY_PASSWORD}`).toString('base64')}`;
+        options.headers['Authorization'] = `Basic ${Buffer.from(
+          `${NTFY_USERNAME}:${NTFY_PASSWORD}`,
+        ).toString('base64')}`;
       }
       if (NTFY_ACTIONS) {
         options.headers['Actions'] = encodeRFC2047(NTFY_ACTIONS);

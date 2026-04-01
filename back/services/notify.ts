@@ -370,7 +370,7 @@ export default class NotificationService {
           textcard: {
             title: `${this.title}`,
             description: `${this.content}`,
-            url: 'https://github.com/whyour/qinglong',
+            url: 'https://github.com/end080101/taskflow',
             btntxt: '更多',
           },
         };

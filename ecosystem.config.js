@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'qinglong',
+      name: 'taskflow',
       max_restarts: 5,
       kill_timeout: 1000,
       wait_ready: true,

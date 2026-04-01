@@ -1,6 +1,7 @@
 version: 2.20.2
-changeLogLink: https://t.me/jiao_long/434
+changeLogLink: https://github.com/end080101/taskflow/releases
 publishTime: 2026-03-01 1800
 changeLog: |
-  1. 修复 path 安全漏洞（重要）
-  
+  1. TaskFlow public release
+  2. New React panel and internal no-login deployment flow
+  3. End-to-end tested main workflows and edge cases
