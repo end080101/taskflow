@@ -38,26 +38,11 @@ Timed task management platform supporting Python3, JavaScript, Shell and Typescr
 - This project is evolved from Qinglong's core scheduling capabilities
 - The goal is not to hide the original foundation, but to build a more modern frontend, deployment flow and testing experience on top of it
 
-## Version
+## Runtime Requirements
 
-### docker
-
-The `latest` image is built on `alpine` and the `debian` image is built on `debian-slim`. If you need to use a dependency that is not supported by `alpine`, it is recommended that you use the `debian` image.
-
-**⚠️ Important**: If you need to run Docker as a **non-root user**, please use the `debian` image. Alpine's `crond` requires root privileges.
-
-```bash
-docker pull whyour/qinglong:latest
-docker pull whyour/qinglong:debian
-```
-
-### npm
-
-The npm version supports `debian/ubuntu/alpine` systems and requires `node/npm/python3/pip3/pnpm` to be installed.
-
-```bash
-npm i @whyour/qinglong
-```
+- Docker deployment is recommended
+- Local development requires `node`, `pnpm`, `python3` and `pip3`
+- Linux package dependencies support `apk`, `apt-get`, `dnf`, `yum` and `pacman`
 
 ## Deployment
 
@@ -110,19 +95,16 @@ Coverage includes:
 - Main workflows: tasks, scripts, envs, dependencies, logs, settings and dashboard
 - Edge workflows: batch operations, complex labels, Linux dependencies, force delete, system reload and long-running log auto-refresh
 
-## Built-in API
+## API and Commands
 
-[View Documentation](https://qinglong.online/guide/user-guide/built-in-api)
-
-## Built-in commands
-
-[View Documentation](https://qinglong.online/guide/user-guide/basic-explanation)
+- The current source code and frontend behavior are the reference
+- A dedicated `docs/` directory can be added later if needed
 
 ## Development
 
 ```bash
-git clone https://github.com/whyour/qinglong.git
-cd qinglong
+git clone https://github.com/end080101/taskflow.git
+cd taskflow
 cp .env.example .env
 pnpm install
 pnpm --dir frontend install
@@ -138,20 +120,7 @@ Open your browser and visit <http://127.0.0.1:5700>
 - This release is intentionally no-login and should be protected by your internal network or upstream reverse proxy auth if exposed wider
 - Historical login-based test scripts were removed; use the current E2E suites instead
 
-## Links
+## Acknowledgements
 
-- [nevinee](https://gitee.com/evine)
-- [crontab-ui](https://github.com/alseambusher/crontab-ui)
-- [Ant Design](https://ant.design)
-- [Ant Design Pro](https://pro.ant.design/)
-- [Umijs](https://umijs.org)
-- [darkreader](https://github.com/darkreader/darkreader)
-- [admin-server](https://github.com/sunpu007/admin-server)
-
-## Name Origin
-
-The Green Dragon, also known as the Canglong, is one of the four elephants and one of the [four spirits of the heavens](https://zh.wikipedia.org/wiki/%E5%A4%A9%E4%B9%8B%E5%9B%9B%E7%81%B5) in traditional Chinese culture. According to the Five Elements, it is a spirit animal representing the East as a green dragon, the five elements are wood, and the season represented is spring, with the eight trigrams dominating vibration. Like the Ying Long, the Cang Long has feathered wings. According to the Zhang Guo Xing Zong (Zhang Guo Xing Zong), "a true dragon is one that has complementary wings".
-
-In the Book of the Later Han Dynasty (後漢書-律曆志下), it is written: "The sun is in the sky, a cold and a summer, the four seasons are ready, all things are changed, the regency moves, and the green dragon moves to the star, which is called the year. (The Year of the Star)
-
-Among the [twenty-eight Chinese constellations](https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%85%AB%E5%AE%BF), the Green Dragon is the generic name for the seven eastern constellations (Horn, Hyper, Diao, Fang, Heart, Tail and Minchi). It is known in Taoism as "Mengzhang" and in different Taoist scriptures as "Dijun", "Shengjian", "Shenjian" and He is also known in different Daoist scriptures as "Dijun", "Shengjun", "Shenjun" and "Ghost Catcher"[1], and is the guardian deity of Daoism, together with the White Tiger Supervisor of Soldiers.
+- The project foundation is built on Qinglong's mature scheduling capabilities
+- The current repository focuses on the new frontend, deployment compatibility and testing improvements

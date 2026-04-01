@@ -37,26 +37,11 @@
 - 本项目基于 Qinglong 的核心能力演进而来
 - 目标不是抹去原项目来源，而是在保留成熟调度能力的基础上，提供更现代的前端与更完整的部署、测试体验
 
-## 版本
+## 运行环境
 
-### docker
-
-`latest` 镜像是基于 `alpine` 构建，`debian` 镜像是基于 `debian-slim` 构建。如果需要使用 `alpine` 不支持的依赖，建议使用 `debian` 镜像
-
-**⚠️ 重要提示**: 如果您需要以**非 root 用户**运行 Docker，请使用 `debian` 镜像。Alpine 的 `crond` 需要 root 权限。
-
-```bash
-docker pull whyour/qinglong:latest
-docker pull whyour/qinglong:debian
-```
-
-### npm
-
-npm 版本支持 `debian/ubuntu/alpine` 系统，需要自行安装 `node/npm/python3/pip3/pnpm`
-
-```bash
-npm i @whyour/qinglong
-```
+- 推荐使用 Docker 部署
+- 本地开发需要自行准备 `node`、`pnpm`、`python3`、`pip3`
+- Linux 依赖安装已兼容 `apk` / `apt-get` / `dnf` / `yum` / `pacman`
 
 ## 部署
 
@@ -95,13 +80,10 @@ node static/build/app.js
 - `QlBaseUrl` 可用于子路径部署
 - Linux 依赖安装已兼容 `apk` / `apt-get` / `dnf` / `yum` / `pacman`
 
-## 内置 API
+## API 与命令
 
-[查看文档](https://qinglong.online/guide/user-guide/built-in-api)
-
-## 内置命令
-
-[查看文档](https://qinglong.online/guide/user-guide/basic-explanation)
+- 当前以仓库源码与前端页面行为为准
+- 如果后续需要，我可以继续帮你补一份独立的 `docs/` 文档
 
 ## 测试
 
@@ -126,10 +108,9 @@ TASKFLOW_BASE_URL="http://127.0.0.1:5700" node test_taskflow_edge.js
 ## 开发
 
 ```bash
-git clone https://github.com/whyour/qinglong.git
-cd qinglong
+git clone https://github.com/end080101/taskflow.git
+cd taskflow
 cp .env.example .env
-# 推荐使用 pnpm https://pnpm.io/zh/installation
 pnpm install
 pnpm --dir frontend install
 pnpm --dir frontend build
@@ -139,20 +120,7 @@ node static/build/app.js
 
 打开你的浏览器，访问 <http://127.0.0.1:5700>
 
-## 链接
+## 致谢
 
-- [nevinee](https://gitee.com/evine)
-- [crontab-ui](https://github.com/alseambusher/crontab-ui)
-- [Ant Design](https://ant.design)
-- [Ant Design Pro](https://pro.ant.design/)
-- [Umijs](https://umijs.org)
-- [darkreader](https://github.com/darkreader/darkreader)
-- [admin-server](https://github.com/sunpu007/admin-server)
-
-## 名称来源
-
-青龙，又名苍龙，在中国传统文化中是四象之一、[天之四灵](https://zh.wikipedia.org/wiki/%E5%A4%A9%E4%B9%8B%E5%9B%9B%E7%81%B5)之一，根据五行学说，它是代表东方的灵兽，为青色的龙，五行属木，代表的季节是春季，八卦主震。苍龙与应龙一样，都是身具羽翼。《张果星宗》称“又有辅翼，方为真龙”。
-
-《后汉书·律历志下》记载：日周于天，一寒一暑，四时备成，万物毕改，摄提迁次，青龙移辰，谓之岁。
-
-在中国[二十八宿](https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%85%AB%E5%AE%BF)中，青龙是东方七宿（角、亢、氐、房、心、尾、箕）的总称。 在早期星宿信仰中，祂是最尊贵的天神。 但被道教信仰吸纳入其神系后，神格大跌，道教将其称为“孟章”，在不同的道经中有“帝君”、“圣将”、“神将”和“捕鬼将”等称呼，与白虎监兵神君一起，是道教的护卫天神。
+- 本项目能力基础来自 Qinglong
+- 新版前端、部署适配与测试体系为本仓库当前维护重点
