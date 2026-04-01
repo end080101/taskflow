@@ -1,9 +1,9 @@
 <div align="center">
 <img width="100" src="https://user-images.githubusercontent.com/22700758/191449379-f9f56204-0e31-4a16-be5a-331f52696a73.png">
 
-<h1 align="center">Qinglong</h1>
+<h1 align="center">TaskFlow</h1>
 
-A self-hosted task scheduler and script management platform for trusted environments, with a new React panel and end-to-end tested workflows.
+A self-hosted task scheduler and script management platform for trusted environments, evolved from Qinglong with a new React panel and end-to-end tested workflows.
 
 [简体中文](./README.md) | English
 
@@ -45,6 +45,11 @@ Timed task management platform supporting Python3, JavaScript, Shell, Typescript
 - No login page in the current release
 - Backend keeps core Qinglong capabilities for cron jobs, scripts, envs, logs, dependencies and notifications
 - Frontend is the new React panel aligned with the current main workflows
+
+## Project Origin
+
+- This project is evolved from Qinglong's core scheduling capabilities
+- The goal is not to hide the original foundation, but to build a more modern frontend, deployment flow and testing experience on top of it
 
 ## Version
 

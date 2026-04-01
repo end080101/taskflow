@@ -1,9 +1,9 @@
 <div align="center">
 <img width="100" src="https://user-images.githubusercontent.com/22700758/191449379-f9f56204-0e31-4a16-be5a-331f52696a73.png">
 
-<h1 align="center">青龙</h1>
+<h1 align="center">TaskFlow</h1>
 
-一个面向内网与自托管场景的任务调度与脚本管理平台，兼容青龙核心能力，并提供新版 React 面板与更完整的端到端测试。
+一个面向内网与自托管场景的任务调度与脚本管理平台，基于 Qinglong 核心能力演进，提供新版 React 面板与更完整的端到端测试。
 
 简体中文 | [English](./README-en.md)
 
@@ -46,6 +46,11 @@ Timed task management platform supporting Python3, JavaScript, Shell, Typescript
 - 默认面向内网/可信环境部署，不提供登录页
 - 后端保留青龙核心任务、脚本、环境变量、日志、依赖、通知能力
 - 前端为新版 React 面板，已对齐当前主要业务链路
+
+## 项目来源
+
+- 本项目基于 Qinglong 的核心能力演进而来
+- 目标不是抹去原项目来源，而是在保留成熟调度能力的基础上，提供更现代的前端与更完整的部署、测试体验
 
 ## 版本
 
