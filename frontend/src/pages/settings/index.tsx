@@ -1,26 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { systemApi, authApi, notificationApi } from '@/services/api';
+import { useMemo, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { notificationApi, systemApi } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/Dialog';
-import {
-  RefreshCw,
-  User,
-  Lock,
-  Info,
-  Globe,
-  Zap,
-  Bell,
-  Send,
-} from 'lucide-react';
+import { Bell, Globe, Info, RefreshCw, Send, Zap } from 'lucide-react';
 import type { SystemInfo } from '@/types';
 
 const NOTIFICATION_TYPES = [
@@ -37,10 +21,6 @@ const NOTIFICATION_TYPES = [
 ];
 
 export default function Settings() {
-  const qc = useQueryClient();
-  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [mirrorSaving, setMirrorSaving] = useState<string | null>(null);
   const [reloadLoading, setReloadLoading] = useState(false);
   const [notifySaving, setNotifySaving] = useState(false);
@@ -64,55 +44,47 @@ export default function Settings() {
     queryFn: () => notificationApi.get(),
   });
 
-  const systemInfo: SystemInfo & {
-    isInitialized?: boolean;
-    changeLog?: string;
-  } = systemData?.data?.data ?? {};
+  const systemInfo: SystemInfo = systemData?.data?.data ?? {};
+  const config =
+    (configData?.data?.data as { info?: Record<string, string> } | undefined)
+      ?.info ?? {};
+  const [mirrorDraft, setMirrorDraft] = useState<Record<string, string>>({});
+  const [notifyTypeDraft, setNotifyTypeDraft] = useState<string | null>(null);
+  const [notifyParamDrafts, setNotifyParamDrafts] = useState<
+    Record<string, string>
+  >({});
 
-  const config = configData?.data?.data ?? {};
-  const [nodeMirror, setNodeMirror] = useState(config.nodeMirror || '');
-  const [pythonMirror, setPythonMirror] = useState(config.pythonMirror || '');
-  const [linuxMirror, setLinuxMirror] = useState(config.linuxMirror || '');
-  const [dependenceProxy, setDependenceProxy] = useState(
-    config.dependenceProxy || '',
-  );
+  const nodeMirror = mirrorDraft.nodeMirror ?? config.nodeMirror ?? '';
+  const pythonMirror = mirrorDraft.pythonMirror ?? config.pythonMirror ?? '';
+  const linuxMirror = mirrorDraft.linuxMirror ?? config.linuxMirror ?? '';
+  const dependenceProxy =
+    mirrorDraft.dependenceProxy ?? config.dependenceProxy ?? '';
 
-  const notifyConfig = notifyData?.data?.data || {};
-  const [notifyType, setNotifyType] = useState(notifyConfig.type || '');
-  const [notifyParams, setNotifyParams] = useState<Record<string, string>>({});
+  const baseNotify = useMemo(() => {
+    const data = (notifyData?.data?.data ?? {}) as Record<string, unknown>;
+    const params: Record<string, string> = {};
 
-  useEffect(() => {
-    if (notifyData?.data?.data) {
-      const data = notifyData.data.data;
-      setNotifyType(data.type || '');
-      const params: Record<string, string> = {};
-      Object.keys(data).forEach((key) => {
-        if (key !== 'type' && data[key]) {
-          params[key] = data[key];
-        }
-      });
-      setNotifyParams(params);
-    }
+    Object.keys(data).forEach((key) => {
+      if (key !== 'type' && typeof data[key] === 'string' && data[key]) {
+        params[key] = data[key] as string;
+      }
+    });
+
+    return {
+      type: typeof data.type === 'string' ? data.type : '',
+      params,
+    };
   }, [notifyData]);
 
-  const changePasswordMutation = useMutation({
-    mutationFn: (data: { old_password: string; password: string }) =>
-      authApi.changePassword(data),
-    onSuccess: () => {
-      setPasswordDialogOpen(false);
-      setOldPassword('');
-      setNewPassword('');
-      alert('密码修改成功');
-    },
-    onError: () => {
-      alert('密码修改失败');
-    },
-  });
+  const notifyType = notifyTypeDraft ?? baseNotify.type;
+  const notifyParams = { ...baseNotify.params, ...notifyParamDrafts };
 
   const updateNotifyMutation = useMutation({
-    mutationFn: (data: any) => notificationApi.update(data),
+    mutationFn: (data: Record<string, string>) => notificationApi.update(data),
     onSuccess: () => {
       setNotifySaving(false);
+      setNotifyTypeDraft(null);
+      setNotifyParamDrafts({});
       refetchNotify();
       alert('通知设置已保存');
     },
@@ -123,82 +95,51 @@ export default function Settings() {
   });
 
   const updateNodeMirrorMutation = useMutation({
-    mutationFn: (nodeMirror: string) => systemApi.updateNodeMirror(nodeMirror),
-    onSuccess: () => {
+    mutationFn: (value: string) => systemApi.updateNodeMirror(value),
+    onSettled: () => {
       setMirrorSaving(null);
       refetchConfig();
-      alert('Node 镜像源已更新');
     },
-    onError: () => {
-      setMirrorSaving(null);
-      alert('更新失败');
-    },
+    onSuccess: () => alert('Node 镜像源已更新'),
+    onError: () => alert('更新失败'),
   });
 
   const updatePythonMirrorMutation = useMutation({
-    mutationFn: (pythonMirror: string) =>
-      systemApi.updatePythonMirror(pythonMirror),
-    onSuccess: () => {
+    mutationFn: (value: string) => systemApi.updatePythonMirror(value),
+    onSettled: () => {
       setMirrorSaving(null);
       refetchConfig();
-      alert('Python 镜像源已更新');
     },
-    onError: () => {
-      setMirrorSaving(null);
-      alert('更新失败');
-    },
+    onSuccess: () => alert('Python 镜像源已更新'),
+    onError: () => alert('更新失败'),
   });
 
   const updateLinuxMirrorMutation = useMutation({
-    mutationFn: (linuxMirror: string) =>
-      systemApi.updateLinuxMirror(linuxMirror),
-    onSuccess: () => {
+    mutationFn: (value: string) => systemApi.updateLinuxMirror(value),
+    onSettled: () => {
       setMirrorSaving(null);
       refetchConfig();
-      alert('Linux 镜像源已更新');
     },
-    onError: () => {
-      setMirrorSaving(null);
-      alert('更新失败');
-    },
+    onSuccess: () => alert('Linux 镜像源已更新'),
+    onError: () => alert('更新失败'),
   });
 
   const updateDependenceProxyMutation = useMutation({
-    mutationFn: (dependenceProxy: string) =>
-      systemApi.updateDependenceProxy(dependenceProxy),
-    onSuccess: () => {
+    mutationFn: (value: string) => systemApi.updateDependenceProxy(value),
+    onSettled: () => {
       setMirrorSaving(null);
       refetchConfig();
-      alert('依赖代理已更新');
     },
-    onError: () => {
-      setMirrorSaving(null);
-      alert('更新失败');
-    },
+    onSuccess: () => alert('依赖代理已更新'),
+    onError: () => alert('更新失败'),
   });
 
   const reloadMutation = useMutation({
     mutationFn: () => systemApi.reload(),
-    onSuccess: () => {
-      setReloadLoading(false);
-      alert('系统已重载');
-    },
-    onError: () => {
-      setReloadLoading(false);
-      alert('重载失败');
-    },
+    onSettled: () => setReloadLoading(false),
+    onSuccess: () => alert('系统已重载'),
+    onError: () => alert('重载失败'),
   });
-
-  const handleChangePassword = () => {
-    if (!newPassword.trim()) {
-      alert('请输入新密码');
-      return;
-    }
-    changePasswordMutation.mutate({
-      old_password: oldPassword,
-      password: newPassword,
-    });
-  };
 
   const handleSaveMirror = (type: string) => {
     setMirrorSaving(type);
@@ -312,7 +253,6 @@ export default function Settings() {
 
   return (
     <div className="space-y-4 max-w-4xl">
-      {/* System Info */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -329,38 +269,29 @@ export default function Settings() {
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-muted)]">版本</div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">
-                  {systemInfo.version || '—'}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-muted)]">分支</div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">
-                  {systemInfo.branch || '—'}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-muted)]">
-                  Node 版本
-                </div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">
-                  {systemInfo.node_version || '—'}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-[var(--text-muted)]">平台</div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">
-                  {systemInfo.platform || '—'}
-                </div>
-              </div>
+              <InfoItem label="版本" value={systemInfo.version || '—'} />
+              <InfoItem label="分支" value={systemInfo.branch || '—'} />
+              <InfoItem
+                label="发布时间"
+                value={
+                  systemInfo.publishTime
+                    ? new Date(systemInfo.publishTime * 1000).toLocaleString(
+                        'zh-CN',
+                      )
+                    : '—'
+                }
+              />
+              <InfoItem
+                label="初始化状态"
+                value={
+                  systemInfo.isInitialized === false ? '待初始化' : '已就绪'
+                }
+              />
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Notification Settings */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -376,7 +307,7 @@ export default function Settings() {
             <select
               className="w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)]"
               value={notifyType}
-              onChange={(e) => setNotifyType(e.target.value)}
+              onChange={(e) => setNotifyTypeDraft(e.target.value)}
             >
               {NOTIFICATION_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -394,7 +325,7 @@ export default function Settings() {
               <Input
                 value={notifyParams[field.key] || ''}
                 onChange={(e) =>
-                  setNotifyParams((prev) => ({
+                  setNotifyParamDrafts((prev) => ({
                     ...prev,
                     [field.key]: e.target.value,
                   }))
@@ -404,17 +335,13 @@ export default function Settings() {
             </div>
           ))}
 
-          <Button
-            onClick={handleSaveNotify}
-            disabled={notifySaving || !notifyType}
-          >
+          <Button onClick={handleSaveNotify} disabled={notifySaving}>
             <Send size={14} />
             {notifySaving ? '保存中...' : '保存通知设置'}
           </Button>
         </CardContent>
       </Card>
 
-      {/* Mirror Settings */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -423,89 +350,49 @@ export default function Settings() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[var(--text-primary)]">
-              Node.js 镜像
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={nodeMirror}
-                onChange={(e) => setNodeMirror(e.target.value)}
-                placeholder="https://npm.taobao.org/mirrors/node"
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleSaveMirror('node')}
-                disabled={mirrorSaving === 'node'}
-              >
-                {mirrorSaving === 'node' ? '保存中...' : '保存'}
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[var(--text-primary)]">
-              Python 镜像
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={pythonMirror}
-                onChange={(e) => setPythonMirror(e.target.value)}
-                placeholder="https://pypi.tuna.tsinghua.edu.cn/simple"
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleSaveMirror('python')}
-                disabled={mirrorSaving === 'python'}
-              >
-                {mirrorSaving === 'python' ? '保存中...' : '保存'}
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[var(--text-primary)]">
-              Linux 镜像
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={linuxMirror}
-                onChange={(e) => setLinuxMirror(e.target.value)}
-                placeholder="https://mirrors.tuna.tsinghua.edu.cn"
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleSaveMirror('linux')}
-                disabled={mirrorSaving === 'linux'}
-              >
-                {mirrorSaving === 'linux' ? '保存中...' : '保存'}
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[var(--text-primary)]">
-              依赖代理
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={dependenceProxy}
-                onChange={(e) => setDependenceProxy(e.target.value)}
-                placeholder="http://127.0.0.1:7890"
-                className="flex-1"
-              />
-              <Button
-                onClick={() => handleSaveMirror('proxy')}
-                disabled={mirrorSaving === 'proxy'}
-              >
-                {mirrorSaving === 'proxy' ? '保存中...' : '保存'}
-              </Button>
-            </div>
-          </div>
+          <SettingRow
+            label="Node.js 镜像"
+            value={nodeMirror}
+            onChange={(value) =>
+              setMirrorDraft((prev) => ({ ...prev, nodeMirror: value }))
+            }
+            placeholder="https://registry.npmmirror.com"
+            loading={mirrorSaving === 'node'}
+            onSave={() => handleSaveMirror('node')}
+          />
+          <SettingRow
+            label="Python 镜像"
+            value={pythonMirror}
+            onChange={(value) =>
+              setMirrorDraft((prev) => ({ ...prev, pythonMirror: value }))
+            }
+            placeholder="https://pypi.tuna.tsinghua.edu.cn/simple"
+            loading={mirrorSaving === 'python'}
+            onSave={() => handleSaveMirror('python')}
+          />
+          <SettingRow
+            label="Linux 镜像"
+            value={linuxMirror}
+            onChange={(value) =>
+              setMirrorDraft((prev) => ({ ...prev, linuxMirror: value }))
+            }
+            placeholder="https://mirrors.tuna.tsinghua.edu.cn"
+            loading={mirrorSaving === 'linux'}
+            onSave={() => handleSaveMirror('linux')}
+          />
+          <SettingRow
+            label="依赖代理"
+            value={dependenceProxy}
+            onChange={(value) =>
+              setMirrorDraft((prev) => ({ ...prev, dependenceProxy: value }))
+            }
+            placeholder="http://127.0.0.1:7890"
+            loading={mirrorSaving === 'proxy'}
+            onSave={() => handleSaveMirror('proxy')}
+          />
         </CardContent>
       </Card>
 
-      {/* System Actions */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -531,40 +418,6 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Account Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>账户设置</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border border-[var(--border)] rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
-                  <User size={20} className="text-indigo-400" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-[var(--text-primary)]">
-                    登录密码
-                  </div>
-                  <div className="text-xs text-[var(--text-muted)]">
-                    修改管理员账户密码
-                  </div>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPasswordDialogOpen(true)}
-              >
-                修改密码
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* About */}
       <Card>
         <CardHeader>
           <CardTitle>关于</CardTitle>
@@ -591,53 +444,52 @@ export default function Settings() {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
 
-      {/* Change Password Dialog */}
-      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
-        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-          <DialogHeader>
-            <DialogTitle>修改密码</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-primary)]">
-                当前密码
-              </label>
-              <Input
-                type="password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                placeholder="输入当前密码"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-primary)]">
-                新密码
-              </label>
-              <Input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="输入新密码"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setPasswordDialogOpen(false)}
-            >
-              取消
-            </Button>
-            <Button
-              onClick={handleChangePassword}
-              disabled={changePasswordMutation.isPending}
-            >
-              {changePasswordMutation.isPending ? '修改中...' : '修改'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-xs text-[var(--text-muted)]">{label}</div>
+      <div className="text-sm font-medium text-[var(--text-primary)]">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function SettingRow({
+  label,
+  value,
+  onChange,
+  placeholder,
+  loading,
+  onSave,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  loading: boolean;
+  onSave: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-[var(--text-primary)]">
+        {label}
+      </label>
+      <div className="flex gap-2">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="flex-1"
+        />
+        <Button onClick={onSave} disabled={loading}>
+          {loading ? '保存中...' : '保存'}
+        </Button>
+      </div>
     </div>
   );
 }

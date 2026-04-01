@@ -3,6 +3,8 @@
 
 <h1 align="center">青龙</h1>
 
+一个面向内网与自托管场景的任务调度与脚本管理平台，兼容青龙核心能力，并提供新版 React 面板与更完整的端到端测试。
+
 简体中文 | [English](./README-en.md)
 
 支持 Python3、JavaScript、Shell、Typescript 的定时任务管理平台
@@ -36,6 +38,14 @@ Timed task management platform supporting Python3, JavaScript, Shell, Typescript
 - 支持系统级通知
 - 支持暗黑模式
 - 支持手机端操作
+- 新版 React 面板，支持无登录内网部署
+- 支持 Node.js / Python3 / Linux 依赖管理
+
+## 当前定位
+
+- 默认面向内网/可信环境部署，不提供登录页
+- 后端保留青龙核心任务、脚本、环境变量、日志、依赖、通知能力
+- 前端为新版 React 面板，已对齐当前主要业务链路
 
 ## 版本
 
@@ -60,7 +70,40 @@ npm i @whyour/qinglong
 
 ## 部署
 
-[查看文档](https://qinglong.online/guide/getting-started/installation-guide)
+当前仓库包含两种常用方式：
+
+### Docker 部署
+
+开发后的 Debian 部署文件：`docker/docker-compose.deploy.yml`
+
+```bash
+git clone <your-repo-url>
+cd taskflow
+docker compose -f docker/docker-compose.deploy.yml up -d --build
+```
+
+默认访问地址：<http://127.0.0.1:5700>
+
+### 本机开发
+
+```bash
+git clone <your-repo-url>
+cd taskflow
+cp .env.example .env
+pnpm install
+pnpm --dir frontend install
+pnpm --dir frontend build
+pnpm build:back
+node static/build/app.js
+```
+
+默认访问地址：<http://127.0.0.1:5700>
+
+说明：
+
+- 当前版本默认面向内网/可信环境，无登录页
+- `QlBaseUrl` 可用于子路径部署
+- Linux 依赖安装已兼容 `apk` / `apt-get` / `dnf` / `yum` / `pacman`
 
 ## 内置 API
 
@@ -70,6 +113,26 @@ npm i @whyour/qinglong
 
 [查看文档](https://qinglong.online/guide/user-guide/basic-explanation)
 
+## 测试
+
+仓库内提供两套 Playwright 端到端脚本：
+
+```bash
+TASKFLOW_BASE_URL="http://127.0.0.1:5700" node test_taskflow_full.js
+TASKFLOW_BASE_URL="http://127.0.0.1:5700" node test_taskflow_edge.js
+```
+
+覆盖内容包括：
+
+- 主业务链路：任务、脚本、环境变量、依赖、日志、设置、仪表盘
+- 边缘链路：批量操作、复杂标签、Linux 依赖、强制删除、系统重载、长日志自动刷新
+
+## 已知限制
+
+- 当前默认是无登录部署，适合内网、自托管或反向代理后受控访问场景
+- 如果需要公网暴露，建议自行在上层反代或网关增加认证
+- 旧版与登录相关的历史测试脚本已移除，以当前 E2E 脚本为准
+
 ## 开发
 
 ```bash
@@ -77,9 +140,11 @@ git clone https://github.com/whyour/qinglong.git
 cd qinglong
 cp .env.example .env
 # 推荐使用 pnpm https://pnpm.io/zh/installation
-npm install -g pnpm@8.3.1
 pnpm install
-pnpm start
+pnpm --dir frontend install
+pnpm --dir frontend build
+pnpm build:back
+node static/build/app.js
 ```
 
 打开你的浏览器，访问 <http://127.0.0.1:5700>

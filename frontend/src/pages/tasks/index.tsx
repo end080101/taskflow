@@ -24,9 +24,14 @@ import {
   ToggleLeft,
   ToggleRight,
   Tag,
-  X,
 } from 'lucide-react';
-import { formatDate, parseCron } from '@/lib/utils';
+import {
+  formatDate,
+  getCronLastRunTime,
+  isCronEnabled,
+  isCronRunning,
+  parseCron,
+} from '@/lib/utils';
 import { TaskModal } from '@/components/TaskModal';
 import type { CronJob } from '@/types';
 
@@ -296,7 +301,7 @@ export default function Tasks() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
-                        {cron.isRunning && (
+                        {isCronRunning(cron) && (
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse flex-shrink-0" />
                         )}
                         <span className="font-medium text-[var(--text-primary)] truncate max-w-[160px]">
@@ -337,27 +342,27 @@ export default function Tasks() {
                       </div>
                     </td>
                     <td className="px-5 py-3 text-xs text-[var(--text-muted)]">
-                      {cron.last_run_time
-                        ? formatDate(cron.last_run_time)
+                      {getCronLastRunTime(cron)
+                        ? formatDate(getCronLastRunTime(cron) as number)
                         : '从未运行'}
                     </td>
                     <td className="px-5 py-3">
-                      {cron.isRunning ? (
+                      {isCronRunning(cron) ? (
                         <Badge variant="running" dot>
                           运行中
                         </Badge>
                       ) : (
                         <Badge
-                          variant={cron.status === 1 ? 'success' : 'default'}
+                          variant={isCronEnabled(cron) ? 'success' : 'default'}
                           dot
                         >
-                          {cron.status === 1 ? '已启用' : '已禁用'}
+                          {isCronEnabled(cron) ? '已启用' : '已禁用'}
                         </Badge>
                       )}
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-1">
-                        {cron.isRunning ? (
+                        {isCronRunning(cron) ? (
                           <Button
                             variant="outline"
                             size="icon"
@@ -377,16 +382,16 @@ export default function Tasks() {
                           </Button>
                         )}
                         <Button
-                          variant={cron.status === 1 ? 'ghost' : 'outline'}
+                          variant={isCronEnabled(cron) ? 'ghost' : 'outline'}
                           size="icon"
-                          title={cron.status === 1 ? '禁用' : '启用'}
+                          title={isCronEnabled(cron) ? '禁用' : '启用'}
                           onClick={() =>
-                            cron.status === 1
+                            isCronEnabled(cron)
                               ? disableMutation.mutate([cron.id])
                               : enableMutation.mutate([cron.id])
                           }
                         >
-                          {cron.status === 1 ? (
+                          {isCronEnabled(cron) ? (
                             <ToggleRight size={12} />
                           ) : (
                             <ToggleLeft size={12} />

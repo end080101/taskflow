@@ -29,7 +29,7 @@ import { logStreamManager } from '../shared/logStreamManager';
 
 @Service()
 export default class CronService {
-  constructor(@Inject('logger') private logger: winston.Logger) { }
+  constructor(@Inject('logger') private logger: winston.Logger) {}
 
   private isNodeCron(cron: Crontab) {
     const { schedule, extra_schedules } = cron;
@@ -165,7 +165,7 @@ export default class CronService {
       let cron;
       try {
         cron = await this.getDb({ id });
-      } catch (err) { }
+      } catch (err) {}
       if (!cron) {
         continue;
       }
@@ -644,7 +644,9 @@ export default class CronService {
     if (!command.startsWith(TASK_PREFIX) && !command.startsWith(QL_PREFIX)) {
       command = `${TASK_PREFIX}${tab.command}`;
     }
-    let commandVariable = `real_time=${Boolean(realTime)} no_tee=true ID=${tab.id} `;
+    let commandVariable = `real_time=${Boolean(realTime)} no_tee=true ID=${
+      tab.id
+    } `;
     // Only include log_name if it has a truthy value to avoid passing null/undefined to shell
     if (tab.log_name) {
       commandVariable += `log_name=${tab.log_name} `;
@@ -691,7 +693,7 @@ export default class CronService {
     await writeFileWithLock(config.crontabFile, crontab_string);
 
     try {
-      execSync(`crontab ${config.crontabFile}`);
+      execSync(`crontab ${config.crontabFile}`, { timeout: 5000 });
     } catch (error: any) {
       const errorMsg = error.message || String(error);
       this.logger.error('[crontab] Failed to update system crontab:', errorMsg);

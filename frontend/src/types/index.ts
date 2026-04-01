@@ -4,13 +4,12 @@ export interface CronJob {
   name: string;
   command: string;
   schedule: string;
-  status: 0 | 1; // 0=disabled, 1=enabled
-  isRunning?: boolean;
-  isPinned?: boolean;
+  status: number;
+  isDisabled?: 0 | 1;
+  isPinned?: 0 | 1;
   labels?: string[];
-  last_execution_time?: string;
-  last_run_time?: string;
-  next_execution_time?: string;
+  last_running_time?: number;
+  last_execution_time?: number;
   log_path?: string;
   pid?: number;
   env_ids?: number[];
@@ -22,8 +21,9 @@ export interface EnvItem {
   name: string;
   value: string;
   remarks?: string;
-  status: 0 | 1;
+  status: number;
   position?: number;
+  isPinned?: 0 | 1;
 }
 
 // 脚本文件
@@ -37,48 +37,38 @@ export interface ScriptFile {
 
 // 日志
 export interface LogEntry {
-  id: number;
   name: string;
-  status: 'running' | 'success' | 'failed' | 'queued';
-  command: string;
-  pid?: number;
-  log_path?: string;
+  status: 'running' | 'archived';
+  path?: string;
+  file?: string;
   created_at?: string;
-  updated_at?: string;
+  size?: number;
 }
 
 // 系统信息
 export interface SystemInfo {
+  isInitialized?: boolean;
   version?: string;
+  publishTime?: number;
   branch?: string;
-  node_version?: string;
-  platform?: string;
-}
-
-// 订阅
-export interface Subscription {
-  id: number;
-  name: string;
-  url: string;
-  type: 'public-repo' | 'private-repo' | 'file-url';
-  schedule?: string;
-  status: 0 | 1;
-  last_run_time?: string;
+  changeLog?: string;
+  changeLogLink?: string;
 }
 
 // 依赖包
 export interface Dependence {
   id: number;
   name: string;
-  type: 'nodejs' | 'python3' | 'linux';
+  type: number;
   status?: number;
-  log?: string;
+  log?: string[];
+  remark?: string;
   created?: string;
   updated?: string;
 }
 
 // API 通用响应
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   code: number;
   data: T;
   message?: string;

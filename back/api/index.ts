@@ -8,7 +8,6 @@ import script from './script';
 import open from './open';
 import dependence from './dependence';
 import system from './system';
-import subscription from './subscription';
 import update from './update';
 import health from './health';
 
@@ -23,7 +22,6 @@ export default () => {
   open(app);
   dependence(app);
   system(app);
-  subscription(app);
   update(app);
   health(app);
 

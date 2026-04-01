@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { EnvModal } from '@/components/EnvModal';
 import type { EnvItem } from '@/types';
+import { isEnvEnabled } from '@/lib/utils';
 
 export default function Envs() {
   const [search, setSearch] = useState('');
@@ -31,7 +32,7 @@ export default function Envs() {
     queryFn: () => envApi.list({ searchValue: search }),
   });
 
-  const envs: EnvItem[] = data?.data?.data ?? [];
+  const envs = (data?.data?.data ?? []) as EnvItem[];
 
   const deleteMutation = useMutation({
     mutationFn: (ids: number[]) => envApi.delete(ids),
@@ -218,25 +219,25 @@ export default function Envs() {
                     </td>
                     <td className="px-5 py-3">
                       <Badge
-                        variant={env.status === 1 ? 'success' : 'default'}
+                        variant={isEnvEnabled(env) ? 'success' : 'default'}
                         dot
                       >
-                        {env.status === 1 ? '已启用' : '已禁用'}
+                        {isEnvEnabled(env) ? '已启用' : '已禁用'}
                       </Badge>
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-1">
                         <Button
-                          variant={env.status === 1 ? 'ghost' : 'outline'}
+                          variant={isEnvEnabled(env) ? 'ghost' : 'outline'}
                           size="icon"
-                          title={env.status === 1 ? '禁用' : '启用'}
+                          title={isEnvEnabled(env) ? '禁用' : '启用'}
                           onClick={() =>
-                            env.status === 1
+                            isEnvEnabled(env)
                               ? disableMutation.mutate([env.id])
                               : enableMutation.mutate([env.id])
                           }
                         >
-                          {env.status === 1 ? (
+                          {isEnvEnabled(env) ? (
                             <ToggleRight size={12} />
                           ) : (
                             <ToggleLeft size={12} />

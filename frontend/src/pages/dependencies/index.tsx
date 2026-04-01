@@ -16,19 +16,38 @@ import { Plus, Trash2, RefreshCw, XCircle, Play } from 'lucide-react';
 import type { Dependence } from '@/types';
 
 const DEP_TYPES: { value: number | string; label: string }[] = [
-  { value: 1, label: 'Node.js' },
-  { value: 2, label: 'Python3' },
-  { value: 3, label: 'Linux' },
+  { value: 'nodejs', label: 'Node.js' },
+  { value: 'python3', label: 'Python3' },
+  { value: 'linux', label: 'Linux' },
 ];
+
+const DEP_CREATE_TYPES: { value: number; label: string }[] = [
+  { value: 0, label: 'Node.js' },
+  { value: 1, label: 'Python3' },
+  { value: 2, label: 'Linux' },
+];
+
+const DEP_TYPE_LABELS: Record<number, string> = {
+  0: 'Node.js',
+  1: 'Python3',
+  2: 'Linux',
+};
 
 const STATUS_MAP: Record<
   number,
-  { label: string; variant: 'default' | 'success' | 'running' | 'error' }
+  {
+    label: string;
+    variant: 'default' | 'success' | 'running' | 'error' | 'warning';
+  }
 > = {
-  0: { label: '队列中', variant: 'default' },
-  1: { label: '安装中', variant: 'running' },
-  2: { label: '安装成功', variant: 'success' },
-  3: { label: '安装失败', variant: 'error' },
+  0: { label: '安装中', variant: 'running' },
+  1: { label: '已安装', variant: 'success' },
+  2: { label: '安装失败', variant: 'error' },
+  3: { label: '卸载中', variant: 'running' },
+  4: { label: '已删除', variant: 'default' },
+  5: { label: '删除失败', variant: 'error' },
+  6: { label: '队列中', variant: 'default' },
+  7: { label: '已取消', variant: 'warning' },
 };
 
 export default function Dependencies() {
@@ -39,15 +58,15 @@ export default function Dependencies() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newDeps, setNewDeps] = useState<
     { name: string; type: number; remark: string }[]
-  >([{ name: '', type: 1, remark: '' }]);
+  >([{ name: '', type: 0, remark: '' }]);
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['dependencies', search, typeFilter],
     queryFn: () =>
       dependenceApi.list({ searchValue: search, type: typeFilter }),
   });
 
-  const deps: Dependence[] = data?.data?.data ?? [];
+  const deps = (data?.data?.data ?? []) as Dependence[];
 
   const createMutation = useMutation({
     mutationFn: (data: { name: string; type: number; remark?: string }[]) =>
@@ -55,7 +74,7 @@ export default function Dependencies() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['dependencies'] });
       setCreateDialogOpen(false);
-      setNewDeps([{ name: '', type: 1, remark: '' }]);
+      setNewDeps([{ name: '', type: 0, remark: '' }]);
     },
   });
 
@@ -90,7 +109,7 @@ export default function Dependencies() {
   };
 
   const handleAddDep = () => {
-    setNewDeps((prev) => [...prev, { name: '', type: 1, remark: '' }]);
+    setNewDeps((prev) => [...prev, { name: '', type: 0, remark: '' }]);
   };
 
   const handleRemoveDep = (index: number) => {
@@ -239,8 +258,7 @@ export default function Dependencies() {
                     </td>
                     <td className="px-5 py-3">
                       <span className="text-[var(--text-muted)]">
-                        {DEP_TYPES.find((t) => t.value === dep.type)?.label ||
-                          dep.type}
+                        {DEP_TYPE_LABELS[dep.type] || dep.type}
                       </span>
                     </td>
                     <td className="px-5 py-3">
@@ -250,7 +268,9 @@ export default function Dependencies() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-1">
-                        {dep.status === 1 ? (
+                        {dep.status === 0 ||
+                        dep.status === 3 ||
+                        dep.status === 6 ? (
                           <Button
                             variant="outline"
                             size="icon"
@@ -315,7 +335,7 @@ export default function Dependencies() {
                         handleDepChange(index, 'type', Number(e.target.value))
                       }
                     >
-                      {DEP_TYPES.map((t) => (
+                      {DEP_CREATE_TYPES.map((t) => (
                         <option key={t.value} value={t.value}>
                           {t.label}
                         </option>

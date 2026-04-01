@@ -8,6 +8,7 @@ import Logs from '@/pages/logs';
 import Envs from '@/pages/envs';
 import Dependencies from '@/pages/dependencies';
 import Settings from '@/pages/settings';
+import { getRouterBasename } from '@/lib/runtime';
 
 const qc = new QueryClient({
   defaultOptions: {
@@ -19,9 +20,11 @@ const qc = new QueryClient({
 });
 
 export default function App() {
+  const basename = getRouterBasename();
+
   return (
     <QueryClientProvider client={qc}>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Dashboard />} />

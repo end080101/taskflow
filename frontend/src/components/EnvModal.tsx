@@ -18,6 +18,12 @@ interface EnvModalProps {
   editingEnv?: EnvItem | null;
 }
 
+interface EnvPayload {
+  name: string;
+  value: string;
+  remarks?: string;
+}
+
 export function EnvModal({ open, onOpenChange, editingEnv }: EnvModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState('');
@@ -38,7 +44,7 @@ export function EnvModal({ open, onOpenChange, editingEnv }: EnvModalProps) {
   }, [editingEnv, open]);
 
   const createMutation = useMutation({
-    mutationFn: (data: Partial<EnvItem>) => envApi.create(data),
+    mutationFn: (data: EnvPayload[]) => envApi.create(data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['envs'] });
       onOpenChange(false);
@@ -67,7 +73,7 @@ export function EnvModal({ open, onOpenChange, editingEnv }: EnvModalProps) {
       if (editingEnv) {
         await updateMutation.mutateAsync({ ...data, id: editingEnv.id });
       } else {
-        await createMutation.mutateAsync([data] as any);
+        await createMutation.mutateAsync([data]);
       }
     } finally {
       setIsSubmitting(false);

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -9,6 +10,7 @@ import {
   Package,
   Settings,
   Zap,
+  X,
 } from 'lucide-react';
 
 const navItems = [
@@ -22,30 +24,42 @@ const navItems = [
 
 const bottomItems = [{ to: '/settings', icon: Settings, label: '系统设置' }];
 
-export function Sidebar() {
+interface SidebarProps {
+  onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
   return (
     <aside className="w-56 flex-shrink-0 flex flex-col bg-[var(--bg-secondary)] border-r border-[var(--border)] h-full">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-[var(--border)]">
-        <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
-          <Zap size={15} className="text-white" />
+      <div className="flex items-center justify-between px-5 py-5 border-b border-[var(--border)]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
+            <Zap size={15} className="text-white" />
+          </div>
+          <span className="font-bold text-[var(--text-primary)] text-base tracking-tight">
+            TaskFlow
+          </span>
         </div>
-        <span className="font-bold text-[var(--text-primary)] text-base tracking-tight">
-          TaskFlow
-        </span>
+        <button
+          onClick={onNavigate}
+          className="lg:hidden p-1 hover:bg-white/10 rounded transition-colors"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map((item) => (
-          <NavItem key={item.to} {...item} />
+          <NavItem key={item.to} {...item} onClick={onNavigate} />
         ))}
       </nav>
 
       {/* Bottom */}
       <div className="px-3 py-4 border-t border-[var(--border)] space-y-0.5">
         {bottomItems.map((item) => (
-          <NavItem key={item.to} {...item} />
+          <NavItem key={item.to} {...item} onClick={onNavigate} />
         ))}
       </div>
     </aside>
@@ -56,15 +70,18 @@ function NavItem({
   to,
   icon: Icon,
   label,
+  onClick,
 }: {
   to: string;
-  icon: any;
+  icon: LucideIcon;
   label: string;
+  onClick?: () => void;
 }) {
   return (
     <NavLink
       to={to}
       end={to === '/'}
+      onClick={onClick}
       className={({ isActive }) =>
         cn(
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',

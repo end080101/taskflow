@@ -536,8 +536,9 @@ export async function setSystemTimezone(timezone: string): Promise<boolean> {
 }
 
 export function getGetCommand(type: DependenceTypes, name: string): string {
+  const safeName = shellQuote(name.trim());
   const baseCommands = {
-    [DependenceTypes.nodejs]: `pnpm ls -g  | grep "${name}" | head -1`,
+    [DependenceTypes.nodejs]: `pnpm ls -g | grep ${safeName} | head -1`,
     [DependenceTypes.python3]: `
     python3 -c "exec('''
 name='${name}'
@@ -550,18 +551,20 @@ except:
     spec=u.find_spec(name)
     print(name if spec else '')
 ''')"`,
-    [DependenceTypes.linux]: `apk info -es ${name}`,
+    [DependenceTypes.linux]: `if command -v apk >/dev/null 2>&1; then apk info -e ${safeName} >/dev/null 2>&1 && printf 'installed'; elif command -v apt-get >/dev/null 2>&1 && command -v dpkg >/dev/null 2>&1; then dpkg -s ${safeName} >/dev/null 2>&1 && printf 'installed'; elif command -v dnf >/dev/null 2>&1; then rpm -q ${safeName} >/dev/null 2>&1 && printf 'installed'; elif command -v yum >/dev/null 2>&1; then rpm -q ${safeName} >/dev/null 2>&1 && printf 'installed'; elif command -v pacman >/dev/null 2>&1; then pacman -Q ${safeName} >/dev/null 2>&1 && printf 'installed'; fi`,
   };
 
   return baseCommands[type];
 }
 
 export function getInstallCommand(type: DependenceTypes, name: string): string {
+  const trimmedName = name.trim();
+  const safeName = shellQuote(trimmedName);
   const baseCommands = {
     [DependenceTypes.nodejs]: 'pnpm add -g',
     [DependenceTypes.python3]:
       'pip3 install --disable-pip-version-check --root-user-action=ignore',
-    [DependenceTypes.linux]: 'apk add --no-check-certificate',
+    [DependenceTypes.linux]: `if command -v apk >/dev/null 2>&1; then apk add --no-check-certificate ${safeName}; elif command -v apt-get >/dev/null 2>&1; then export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends ${safeName}; elif command -v dnf >/dev/null 2>&1; then dnf install -y ${safeName}; elif command -v yum >/dev/null 2>&1; then yum install -y ${safeName}; elif command -v pacman >/dev/null 2>&1; then pacman -Sy --noconfirm ${safeName}; else echo 'Unsupported linux package manager' >&2; exit 1; fi`,
   };
 
   let command = baseCommands[type];
@@ -570,21 +573,34 @@ export function getInstallCommand(type: DependenceTypes, name: string): string {
     command = `${command} --prefix=${PYTHON_INSTALL_DIR}`;
   }
 
-  return `${command} ${name.trim()}`;
+  if (type === DependenceTypes.linux) {
+    return command;
+  }
+
+  return `${command} ${trimmedName}`;
 }
 
 export function getUninstallCommand(
   type: DependenceTypes,
   name: string,
 ): string {
+  const safeName = shellQuote(name.trim());
   const baseCommands = {
     [DependenceTypes.nodejs]: 'pnpm remove -g',
     [DependenceTypes.python3]:
       'pip3 uninstall --disable-pip-version-check --root-user-action=ignore -y',
-    [DependenceTypes.linux]: 'apk del',
+    [DependenceTypes.linux]: `if command -v apk >/dev/null 2>&1; then apk del ${safeName}; elif command -v apt-get >/dev/null 2>&1; then export DEBIAN_FRONTEND=noninteractive && apt-get remove -y ${safeName}; elif command -v dnf >/dev/null 2>&1; then dnf remove -y ${safeName}; elif command -v yum >/dev/null 2>&1; then yum remove -y ${safeName}; elif command -v pacman >/dev/null 2>&1; then pacman -R --noconfirm ${safeName}; else echo 'Unsupported linux package manager' >&2; exit 1; fi`,
   };
 
+  if (type === DependenceTypes.linux) {
+    return baseCommands[type];
+  }
+
   return `${baseCommands[type]} ${name.trim()}`;
+}
+
+function shellQuote(value: string) {
+  return `'${value.replace(/'/g, `'\\''`)}'`;
 }
 
 export function isDemoEnv() {

@@ -38,11 +38,11 @@ export const cronApi = {
 
 export const envApi = {
   list: (params?: { searchValue?: string }) =>
-    http.get<ApiResponse<any[]>>('/envs', { params }),
+    http.get<ApiResponse<unknown[]>>('/envs', { params }),
 
-  create: (data: any) => http.post<ApiResponse>('/envs', data),
+  create: (data: unknown) => http.post<ApiResponse>('/envs', data),
 
-  update: (data: any) => http.put<ApiResponse>('/envs', data),
+  update: (data: unknown) => http.put<ApiResponse>('/envs', data),
 
   delete: (ids: number[]) => http.delete<ApiResponse>('/envs', { data: ids }),
 
@@ -53,7 +53,7 @@ export const envApi = {
 
 export const scriptApi = {
   list: (params?: { path?: string }) =>
-    http.get<ApiResponse<any[]>>('/scripts', { params }),
+    http.get<ApiResponse<unknown[]>>('/scripts', { params }),
 
   getDetail: (path: string, file: string) =>
     http.get<ApiResponse<string>>('/scripts/detail', {
@@ -63,8 +63,12 @@ export const scriptApi = {
   get: (filename: string, path?: string) =>
     http.get<ApiResponse<string>>(`/scripts/${filename}`, { params: { path } }),
 
-  create: (data: { filename: string; path?: string; content?: string }) =>
-    http.post<ApiResponse>('/scripts', data),
+  create: (data: {
+    filename: string;
+    path?: string;
+    content?: string;
+    directory?: string;
+  }) => http.post<ApiResponse>('/scripts', data),
 
   save: (filename: string, content: string, path?: string) =>
     http.put<ApiResponse>('/scripts', { filename, content, path }),
@@ -82,13 +86,17 @@ export const scriptApi = {
     http.put<ApiResponse>('/scripts/rename', { filename, newFilename, path }),
 
   download: (filename: string, path?: string) =>
-    http.post<ApiResponse>('/scripts/download', { filename, path }),
+    http.post<Blob>(
+      '/scripts/download',
+      { filename, path },
+      { responseType: 'blob' },
+    ),
 };
 
 export const systemApi = {
   info: () => http.get<ApiResponse>('/system'),
   config: () => http.get<ApiResponse>('/system/config'),
-  notify: (data: any) => http.put<ApiResponse>('/system/notify', data),
+  notify: (data: unknown) => http.put<ApiResponse>('/system/notify', data),
   updateNodeMirror: (nodeMirror: string) =>
     http.put<ApiResponse>('/system/config/node-mirror', { nodeMirror }),
   updatePythonMirror: (pythonMirror: string) =>
@@ -112,33 +120,23 @@ export const systemApi = {
 };
 
 export const notificationApi = {
-  get: () => http.get<ApiResponse<any>>('/user/notification'),
-  update: (data: any) => http.put<ApiResponse>('/user/notification', data),
-};
-
-export const authApi = {
-  login: (username: string, password: string) =>
-    http.post<ApiResponse<{ token: string }>>('/user/login', {
-      username,
-      password,
-    }),
-
-  logout: () => http.post<ApiResponse>('/user/logout'),
-
-  changePassword: (data: any) => http.put<ApiResponse>('/user', data),
+  get: () =>
+    http.get<ApiResponse<Record<string, unknown>>>('/user/notification'),
+  update: (data: unknown) => http.put<ApiResponse>('/user/notification', data),
 };
 
 export const logApi = {
-  list: (params?: any) => http.get<ApiResponse<any[]>>('/logs', { params }),
+  list: (params?: Record<string, unknown>) =>
+    http.get<ApiResponse<unknown[]>>('/logs', { params }),
   getDetail: (path: string, file: string) =>
     http.get<ApiResponse<string>>('/logs/detail', { params: { path, file } }),
-  delete: (names: string[]) =>
-    http.delete<ApiResponse>('/logs', { data: names }),
+  delete: (filename: string, path?: string) =>
+    http.delete<ApiResponse>('/logs', { data: { filename, path } }),
 };
 
 export const dependenceApi = {
   list: (params?: { searchValue?: string; type?: string; status?: string }) =>
-    http.get<ApiResponse<any[]>>('/dependencies', { params }),
+    http.get<ApiResponse<unknown[]>>('/dependencies', { params }),
   create: (data: { name: string; type: number; remark?: string }[]) =>
     http.post<ApiResponse>('/dependencies', data),
   update: (data: { id: number; name: string; type: number; remark?: string }) =>
@@ -148,13 +146,4 @@ export const dependenceApi = {
   reinstall: (ids: number[]) =>
     http.put<ApiResponse>('/dependencies/reinstall', ids),
   cancel: (ids: number[]) => http.put<ApiResponse>('/dependencies/cancel', ids),
-};
-
-export const subscriptionApi = {
-  list: () => http.get<ApiResponse<any[]>>('/subscriptions'),
-  create: (data: any) => http.post<ApiResponse>('/subscriptions', data),
-  update: (data: any) => http.put<ApiResponse>('/subscriptions', data),
-  delete: (ids: number[]) =>
-    http.delete<ApiResponse>('/subscriptions', { data: ids }),
-  run: (id: number) => http.put<ApiResponse>(`/subscriptions/${id}/run`),
 };

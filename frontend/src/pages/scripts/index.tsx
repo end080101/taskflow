@@ -19,7 +19,6 @@ import {
   FilePlus,
   Trash2,
   Play,
-  Square,
   Download,
   RefreshCw,
   ChevronRight,
@@ -28,6 +27,15 @@ import {
 } from 'lucide-react';
 import type { ScriptFile } from '@/types';
 
+interface ScriptTreeItem {
+  title?: string;
+  key?: string;
+  parent?: string;
+  type?: string;
+  size?: number;
+  modifiedTime?: number;
+}
+
 export default function Scripts() {
   const qc = useQueryClient();
   const [currentPath, setCurrentPath] = useState('');
@@ -35,7 +43,7 @@ export default function Scripts() {
   const [fileContent, setFileContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState('');
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<Parameters<OnMount>[0] | null>(null);
 
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor;
@@ -45,9 +53,18 @@ export default function Scripts() {
   const getEditorLanguage = (filename: string) => {
     const ext = filename.split('.').pop()?.toLowerCase();
     const map: Record<string, string> = {
-      js: 'javascript', ts: 'typescript', py: 'python', sh: 'shell',
-      bash: 'shell', json: 'json', yaml: 'yaml', yml: 'yaml',
-      md: 'markdown', html: 'html', css: 'css', xml: 'xml',
+      js: 'javascript',
+      ts: 'typescript',
+      py: 'python',
+      sh: 'shell',
+      bash: 'shell',
+      json: 'json',
+      yaml: 'yaml',
+      yml: 'yaml',
+      md: 'markdown',
+      html: 'html',
+      css: 'css',
+      xml: 'xml',
     };
     return map[ext ?? ''] ?? 'plaintext';
   };
@@ -65,7 +82,17 @@ export default function Scripts() {
     queryFn: () => scriptApi.list({ path: currentPath }),
   });
 
-  const scripts: ScriptFile[] = data?.data?.data ?? [];
+  const scripts: ScriptFile[] = ((data?.data?.data ?? []) as ScriptTreeItem[])
+    .map((item) => ({
+      filename: item.title || item.key || '',
+      parent: item.parent,
+      isDir: item.type === 'directory',
+      size: item.size,
+      modified: item.modifiedTime
+        ? new Date(item.modifiedTime).toISOString()
+        : undefined,
+    }))
+    .filter((item) => item.filename);
 
   const createMutation = useMutation({
     mutationFn: (data: {
@@ -109,12 +136,6 @@ export default function Scripts() {
     mutationFn: (data: { filename: string; content?: string; path?: string }) =>
       scriptApi.run(data.filename, data.content, data.path),
     onSuccess: () => alert('脚本已启动'),
-  });
-
-  const stopMutation = useMutation({
-    mutationFn: (data: { filename: string; path?: string }) =>
-      scriptApi.stop(data.filename, data.path),
-    onSuccess: () => alert('脚本已停止'),
   });
 
   const renameMutation = useMutation({
@@ -194,10 +215,10 @@ export default function Scripts() {
   };
 
   const handleRename = () => {
-    if (!renameTarget || !newName.trim()) return;
+    if (!renameTarget || !newFilename.trim()) return;
     renameMutation.mutate({
       filename: renameTarget.filename,
-      newFilename: newName,
+      newFilename,
       path: currentPath,
     });
   };
@@ -211,7 +232,17 @@ export default function Scripts() {
   const handleDownload = async () => {
     if (!selectedFile) return;
     try {
-      await scriptApi.download(selectedFile.filename, currentPath);
+      const result = await scriptApi.download(
+        selectedFile.filename,
+        currentPath,
+      );
+      const blob = result.data as unknown as Blob;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = selectedFile.filename;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (e) {
       console.error('Failed to download:', e);
     }
@@ -442,7 +473,8 @@ export default function Scripts() {
               options={{
                 readOnly: !isEditing,
                 fontSize: 13,
-                fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+                fontFamily:
+                  "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 lineNumbers: 'on',
