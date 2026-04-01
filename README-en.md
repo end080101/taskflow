@@ -7,22 +7,9 @@ A self-hosted task scheduler and script management platform for trusted environm
 
 [简体中文](./README.md) | English
 
-Timed task management platform supporting Python3, JavaScript, Shell, Typescript
+Timed task management platform supporting Python3, JavaScript, Shell and Typescript
 
-[![npm version][npm-version-image]][npm-version-url] [![docker pulls][docker-pulls-image]][docker-pulls-url] [![docker stars][docker-stars-image]][docker-stars-url] [![docker image size][docker-image-size-image]][docker-image-size-url]
-
-[npm-version-image]: https://img.shields.io/npm/v/@whyour/qinglong?style=flat
-[npm-version-url]: https://www.npmjs.com/package/@whyour/qinglong?activeTab=readme
-[docker-pulls-image]: https://img.shields.io/docker/pulls/whyour/qinglong?style=flat
-[docker-pulls-url]: https://hub.docker.com/r/whyour/qinglong
-[docker-stars-image]: https://img.shields.io/docker/stars/whyour/qinglong?style=flat
-[docker-stars-url]: https://hub.docker.com/r/whyour/qinglong
-[docker-image-size-image]: https://img.shields.io/docker/image-size/whyour/qinglong?style=flat
-[docker-image-size-url]: https://hub.docker.com/r/whyour/qinglong
-
-[Demo](http://demo.qinglong.online:4433/) / [Issues](https://github.com/whyour/qinglong/issues) / [Telegram Channel](https://t.me/jiao_long) / [Buy Me a Coffee](https://www.buymeacoffee.com/qinglong)
-
-[演示](http://demo.qinglong.online:4433/) / [反馈](https://github.com/whyour/qinglong/issues) / [Telegram 频道](https://t.me/jiao_long) / [打赏开发者](https://user-images.githubusercontent.com/22700758/244744295-29cd0cd1-c8bb-4ea1-adf6-29bd390ad4dd.jpg)
+[GitHub Issues](https://github.com/end080101/taskflow/issues) / [GitHub Repository](https://github.com/end080101/taskflow)
 </div>
 
 ![cover](https://user-images.githubusercontent.com/22700758/244847235-8dc1ca21-e03f-4606-9458-0541fab60413.png)
