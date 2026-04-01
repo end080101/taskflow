@@ -3,6 +3,8 @@
 
 <h1 align="center">Qinglong</h1>
 
+A self-hosted task scheduler and script management platform for trusted environments, with a new React panel and end-to-end tested workflows.
+
 [简体中文](./README.md) | English
 
 Timed task management platform supporting Python3, JavaScript, Shell, Typescript
@@ -34,6 +36,15 @@ Timed task management platform supporting Python3, JavaScript, Shell, Typescript
 - Support system level notification
 - Support dark mode
 - Support cell phone operation
+- New React dashboard for internal no-login deployment
+- Built-in Node.js / Python3 / Linux dependency management
+
+## Current Positioning
+
+- Designed for self-hosted and trusted internal environments
+- No login page in the current release
+- Backend keeps core Qinglong capabilities for cron jobs, scripts, envs, logs, dependencies and notifications
+- Frontend is the new React panel aligned with the current main workflows
 
 ## Version
 
@@ -58,7 +69,54 @@ npm i @whyour/qinglong
 
 ## Deployment
 
-[View Documentation](https://qinglong.online/guide/getting-started/installation-guide)
+Two common ways are included in this repo:
+
+### Docker deployment
+
+Use `docker/docker-compose.deploy.yml`:
+
+```bash
+git clone <your-repo-url>
+cd taskflow
+docker compose -f docker/docker-compose.deploy.yml up -d --build
+```
+
+Default URL: <http://127.0.0.1:5700>
+
+### Local development
+
+```bash
+git clone <your-repo-url>
+cd taskflow
+cp .env.example .env
+pnpm install
+pnpm --dir frontend install
+pnpm --dir frontend build
+pnpm build:back
+node static/build/app.js
+```
+
+Default URL: <http://127.0.0.1:5700>
+
+Notes:
+
+- This release is intended for trusted internal deployment without a login page
+- `QlBaseUrl` is supported for sub-path deployment
+- Linux package dependencies now support `apk`, `apt-get`, `dnf`, `yum` and `pacman`
+
+## Testing
+
+Two Playwright end-to-end suites are included:
+
+```bash
+TASKFLOW_BASE_URL="http://127.0.0.1:5700" node test_taskflow_full.js
+TASKFLOW_BASE_URL="http://127.0.0.1:5700" node test_taskflow_edge.js
+```
+
+Coverage includes:
+
+- Main workflows: tasks, scripts, envs, dependencies, logs, settings and dashboard
+- Edge workflows: batch operations, complex labels, Linux dependencies, force delete, system reload and long-running log auto-refresh
 
 ## Built-in API
 
@@ -74,13 +132,19 @@ npm i @whyour/qinglong
 git clone https://github.com/whyour/qinglong.git
 cd qinglong
 cp .env.example .env
-# Recommended use pnpm https://pnpm.io/zh/installation
-npm install -g pnpm@8.3.1
 pnpm install
-pnpm start
+pnpm --dir frontend install
+pnpm --dir frontend build
+pnpm build:back
+node static/build/app.js
 ```
 
 Open your browser and visit <http://127.0.0.1:5700>
+
+## Known Limitations
+
+- This release is intentionally no-login and should be protected by your internal network or upstream reverse proxy auth if exposed wider
+- Historical login-based test scripts were removed; use the current E2E suites instead
 
 ## Links
 
